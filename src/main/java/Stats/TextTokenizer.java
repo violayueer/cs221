@@ -12,6 +12,7 @@ public class TextTokenizer {
     private Set<String> stopWords;
 
     public TextTokenizer() {
+
         stopWords = new HashSet<String>();
     }
 
