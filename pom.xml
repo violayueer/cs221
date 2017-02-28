@@ -15,6 +15,14 @@
             <artifactId>jsoup</artifactId>
             <version>1.10.2</version>
         </dependency>
+
+        <dependency>
+            <groupId>classmexer</groupId>
+            <artifactId>classmexer</artifactId>
+            <version>0.3</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/src/main/resources/classmexer.jar</systemPath>
+        </dependency>
     </dependencies>
 
 </project>

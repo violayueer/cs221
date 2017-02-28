@@ -14,12 +14,12 @@ public class TextTokenizer {
     public TextTokenizer() {
 
         stopWords = new HashSet<String>();
-    }
-
-    public List<String> tokenize(String inputString) {
         String filepath = new File("").getAbsolutePath();
         File stopWordListFile = new File(filepath + "/src/main/java/longStopWordList.txt");
         loadStopWordList(stopWordListFile);
+    }
+
+    public List<String> tokenize(String inputString) {
 
         List<String> tokenList = new ArrayList<String>();
 

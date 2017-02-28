@@ -1,5 +1,6 @@
 package Indexing;
 
+import Stats.ReduceFrequencyCount;
 import Stats.TextTokenizer;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -13,26 +14,39 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
+import com.javamex.classmexer.MemoryUtil;
+
 /**
  * Created by Yue on 2/26/17.
  */
 public class IndexBuilder {
     private Map<String, Integer> urlIdMap = new HashMap<String, Integer>();
 
+    // term - termId map
+    private Map<String, Integer> termtoTermIdMap = new HashMap<String, Integer>();
+    private Map<Integer, String> termIdtoTermMap = new HashMap<Integer, String>();
+
     //TFIDF maps
-    private Map<String, Map<Integer, List<Integer>>> TFMap = new HashMap<String, Map<Integer, List<Integer>>>();
+    private TreeMap<Integer, Map<Integer, List<Integer>>> TFMap = new TreeMap<Integer, Map<Integer, List<Integer>>>();
     private Map<String, Integer> DFMap = new HashMap<String, Integer>();
-    private Map<String, Map<Integer, Double>> TFIDFMap = new HashMap<String, Map<Integer, Double>>();
+    private Map<Integer, Map<Integer, Double>> TFIDFMap = new HashMap<Integer, Map<Integer, Double>>();
 
     private TextTokenizer textTokenizer;
+    private ReduceFrequencyCount reduceFrequencyCount;
+
+    private int countSucc = 0;
+    private int blockNum = 0;
+    private int TFMapMemoUsage = 0;
+
+    private int termIdCount = 0;
 
     public IndexBuilder() {
         textTokenizer = new TextTokenizer();
+        reduceFrequencyCount = new ReduceFrequencyCount();
     }
 
     public void initialize() {
         String filepath = new File("").getAbsolutePath();
-
         filepath = filepath.concat("/src/main/java/WEBPAGES_RAW/");
 
         String bookkeepingFilePath = filepath.concat("bookkeeping.tsv");
@@ -55,24 +69,100 @@ public class IndexBuilder {
 
                 //read contents from document
                 String contents = new String(Files.readAllBytes(Paths.get(fileNamePath)), StandardCharsets.UTF_8);
-                //contents = contents.trim();
+                //filter large size file
+                if (8 * (int) ((((contents.length()) * 2) + 45) / 8) > 1000000) {
+                    continue;
+                }
 
                 //using jsoup to remove tags from html
-                //String cleanHtml = Jsoup.clean(contents, Whitelist.relaxed());
-                if (contents != null && contents.length() != 0) {
-                    System.out.println(fileNamePath + "-----" + contents);
+                try {
+                    //System.out.println(fileNamePath);
+                    String cleanHtml = Jsoup.clean(contents, Whitelist.relaxed());
 
-                    Document doc = Jsoup.parse(contents);
-                    String docText = doc.text();
+                    if (cleanHtml != null && cleanHtml.length() != 0) {
+                        //System.out.println(fileNamePath + "-----" + contents);
+                        Document doc = Jsoup.parse(cleanHtml);
+                        String docText = doc.text();
 
-                    int wordNum = buildInvertedIndex(urlIdMap.get(url), docText);
-                    computeTFIDF(wordNum);
+                        buildInvertedIndex(urlIdMap.get(url), docText);
+
+                        // calculate the TFMap size
+                        //long noBytes = MemoryUtil.deepMemoryUsageOf(TFMap);
+                        // if TFMap size reach block size limit, then write block to disk
+                        if (Runtime.getRuntime().freeMemory() < 1000 || !scanner.hasNextLine()) {
+                            writeBlockToDisk();
+                        }
+                    }
+                }catch (Exception e) {
+                    System.out.println("Illegal, skip");
                 }
+
             }
+            int roundNum = mergeBlock(0, blockNum);
+            computeTFIDF(urlIdMap.size(), roundNum);
 
         } catch (IOException e) {
             e.printStackTrace();
+
         }
+    }
+
+    public void writeBlockToDisk() {
+        try {
+            String outputBlockPath = "round0_block" + blockNum + ".txt";
+
+            File outPutBlock = new File(outputBlockPath);
+
+            FileOutputStream fos = new FileOutputStream(outPutBlock);
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+
+            //block: 1,1,3,[1,2,3] || termId, urlId, frequency, positions
+            for (Integer termId : TFMap.keySet()) {
+                Map<Integer, List<Integer>> posMap = TFMap.get(termId);
+
+                reduceFrequencyCount.writePosMaptoFile(bw, termId, posMap);
+            }
+            bw.close();
+            blockNum++;
+            TFMap.clear();
+            TFMapMemoUsage = 0;
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public int mergeBlock(int roundNum, int blockCount) {
+        if (blockCount == 1) {
+            return roundNum;
+        }
+        String baseFilepath = new File("").getAbsolutePath();
+        int count = 0;
+
+        for (int i = 0; i < blockCount - 1; i += 2) {
+            String filePath1 = baseFilepath + "/round" + roundNum + "_block" + i + ".txt";
+            String filePath2 = baseFilepath + "/round" + roundNum + "_block" + (i + 1) + ".txt";
+
+
+            String outputFilePath = baseFilepath + "/round" + (roundNum + 1) + "_block" + count + ".txt";
+            count++;
+            reduceFrequencyCount.reduceCounts(filePath1, filePath2, outputFilePath);
+
+        }
+        if (blockCount % 2 != 0) {
+            String oldFileName = baseFilepath + "/round" + roundNum + "_block" + (blockCount - 1) + ".txt";
+            String newFileName = baseFilepath + "/round" + (roundNum + 1) + "_block" + count + ".txt";
+            File oldFile = new File(oldFileName);
+            File newFile = new File(newFileName);
+            oldFile.renameTo(newFile);
+            count++;
+        }
+        roundNum++;
+        mergeBlock(roundNum, count);
+        return 0;
     }
 
     public void buildUrlIdMap(String url) {
@@ -88,27 +178,46 @@ public class IndexBuilder {
         for (int i = 0; i < tokenList.size(); i++) {
             String token = tokenList.get(i);
 
-            Map<Integer, List<Integer>> posMap = null;
+            if (token.equals("")) {
+                continue;
+            }
+            int termId = 0;
 
-            if (!TFMap.containsKey(token)) {
-                posMap = new HashMap<Integer, List<Integer>>();
-                posMap.put(urlId, new ArrayList<Integer>(i));
+            // build term-termId map
+            if (!termtoTermIdMap.containsKey(token)) {
+                termId = termIdCount++;
+                termtoTermIdMap.put(token, termId);
+                termIdtoTermMap.put(termId, token);
+            }else {
+                termId = termtoTermIdMap.get(token);
+            }
 
-                TFMap.put(token, posMap);
+            if (!TFMap.containsKey(termId)) {
+                Map<Integer, List<Integer>> posMap = new HashMap<Integer, List<Integer>>();
+                List<Integer> posList = new ArrayList<Integer>();
+                posList.add(i);
+                posMap.put(urlId, posList);
+
+                TFMap.put(termId, posMap);
+
+                TFMapMemoUsage += 36;
                 //DFMap.put(token, 1);
 
                 //currDocTokenSet.add(token);
 
             }else {
-                posMap = TFMap.get(token);
+                //posMap = TFMap.get(termId);
 
-                if (posMap.containsKey(urlId)) {
-                    posMap.get(urlId).add(i);
+                if (TFMap.get(termId).containsKey(urlId)) {
+                    TFMap.get(termId).get(urlId).add(i);
                 }else {
-                    posMap.put(urlId, new ArrayList<Integer>(i));
+                    List<Integer> posList = new ArrayList<Integer>();
+                    posList.add(i);
+                    TFMap.get(termId).put(urlId, posList);
                 }
+                TFMapMemoUsage += 4;
 
-                TFMap.put(token, posMap);
+                //TFMap.put(termId, posMap);
 
                 /*if (!currDocTokenSet.contains(token)) {
                     DFMap.put(token, DFMap.get(token) + 1);
@@ -116,25 +225,41 @@ public class IndexBuilder {
                 }*/
 
             }
+            //posMap.clear();
         }
         return tokenList.size();
     }
 
-    public void computeTFIDF(int wordNum) {
-        for (String token : TFMap.keySet()) {
-            Map<Integer, List<Integer>> posMap = TFMap.get(token);
+    public void computeTFIDF(int urlCount, int roundNum) {
+        String baseFilepath = new File("").getAbsolutePath();
+        String filePath = baseFilepath + "/round" + roundNum + "_block0.txt";
 
-            int df = TFMap.get(token).size();
-            Map<Integer, Double> map = new HashMap<Integer, Double>();
+        try {
+            Scanner in =  new Scanner(new FileReader(filePath));
 
-            for (Integer urlId : posMap.keySet()) {
-                int tf = posMap.get(urlId).size();
-                double tfidf = Math.log10((double)wordNum / (double)df) * Math.log(1 + (double)tf);
+            while (in.hasNextLine()) {
+                String line = in.nextLine();
+                String[] strs = line.split(",");
 
-                map.put(urlId, tfidf);
+                Integer termId = Integer.parseInt(strs[0]);
+                Map<Integer, List<Integer>> posMap = new HashMap<Integer, List<Integer>>();
+
+                reduceFrequencyCount.buildPosMap(posMap, strs, 1);
+                int df = posMap.size();
+                Map<Integer, Double> map = new HashMap<Integer, Double>();
+
+                for (Integer urlId : posMap.keySet()) {
+                    int tf = posMap.get(urlId).size();
+                    double tfidf = Math.log10((double)urlCount / (double)df) * Math.log(1 + (double)tf);
+
+                    map.put(urlId, tfidf);
+                }
+                posMap.clear();
+                TFIDFMap.put(termId, map);
             }
 
-            TFIDFMap.put(token, map);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
     }
 
@@ -145,12 +270,12 @@ public class IndexBuilder {
             FileOutputStream fos = new FileOutputStream(outPutFile);
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
 
-            for (String token : TFIDFMap.keySet()) {
-                StringBuilder sb = new StringBuilder(token);
-                sb.append(" ,TF: " + TFMap.get(token).size());
+            for (Integer termId : TFIDFMap.keySet()) {
+                StringBuilder sb = new StringBuilder(termId);
+                sb.append(", TF: " + TFMap.get(termId).size());
 
-                Map<Integer, Double> map = TFIDFMap.get(token);
-                sb.append(" ,TFIDF: ");
+                Map<Integer, Double> map = TFIDFMap.get(termId);
+                sb.append(", TFIDF: ");
 
                 for (Integer urlId : map.keySet()) {
                     sb.append("in " + urlId + " is: " + map.get(urlId));
@@ -159,6 +284,8 @@ public class IndexBuilder {
                 bw.write(sb.toString());
                 bw.newLine();
             }
+
+            bw.close();
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -172,5 +299,6 @@ public class IndexBuilder {
         IndexBuilder id = new IndexBuilder();
         id.initialize();
         id.outputResult();
+        //id.computeTFIDF(10000, 0);
     }
 }
