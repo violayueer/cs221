@@ -233,11 +233,14 @@ public class IndexBuilder {
     public void computeTFIDF(int urlCount, int roundNum) {
         String baseFilepath = new File("").getAbsolutePath();
         String filePath = baseFilepath + "/round" + roundNum + "_block0.txt";
+        //int count = 0;
 
         try {
             Scanner in =  new Scanner(new FileReader(filePath));
 
             while (in.hasNextLine()) {
+                //System.out.println(count);
+                //count++;
                 String line = in.nextLine();
                 String[] strs = line.split(",");
 
@@ -271,14 +274,14 @@ public class IndexBuilder {
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
 
             for (Integer termId : TFIDFMap.keySet()) {
-                StringBuilder sb = new StringBuilder(termId);
-                sb.append(", TF: " + TFMap.get(termId).size());
+                StringBuilder sb = new StringBuilder("");
+                sb.append(termId + ", TF: " + TFIDFMap.get(termId).size());
 
                 Map<Integer, Double> map = TFIDFMap.get(termId);
                 sb.append(", TFIDF: ");
 
                 for (Integer urlId : map.keySet()) {
-                    sb.append("in " + urlId + " is: " + map.get(urlId));
+                    sb.append(" in " + urlId + " is: " + map.get(urlId));
                 }
 
                 bw.write(sb.toString());
