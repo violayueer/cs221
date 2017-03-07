@@ -43,7 +43,7 @@ public class IndexBuilder {
 
     public void initialize() {
         String filepath = new File("").getAbsolutePath();
-        filepath = filepath.concat("/src/main/java/WEBPAGES_RAW/");
+        filepath = filepath.concat("/src/WEBPAGES_RAW/");
 
         String bookkeepingFilePath = filepath.concat("bookkeeping.tsv");
 
@@ -73,7 +73,7 @@ public class IndexBuilder {
                 //using jsoup to remove tags from html
                 try {
                     //System.out.println(fileNamePath);
-                    String cleanHtml = Jsoup.clean(contents, Whitelist.relaxed());
+                    String cleanHtml = Jsoup.clean(contents, Whitelist.basic());
 
                     if (cleanHtml != null && cleanHtml.length() != 0) {
                         //System.out.println(fileNamePath + "-----" + contents);
@@ -265,8 +265,23 @@ public class IndexBuilder {
     }
 
     public void outputResult() {
-
+        // InvertedIndex: termId, TF, docId, TFIDF
         try {
+            FileOutputStream fos = new FileOutputStream("TFIDFMap.ser");
+
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+
+            oos.writeObject(TFIDFMap);
+            oos.close();
+            fos.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        /*try {
             File outPutFile = new File("invertedIndex.txt");
             FileOutputStream fos = new FileOutputStream(outPutFile);
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
@@ -293,24 +308,20 @@ public class IndexBuilder {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
     }
 
     public void writeTermAndIdMaptoDisk() {
-        String termToTermIdFilePath = "termToTermIdMap.txt";
 
         try {
-            File termToTermIdFile = new File(termToTermIdFilePath);
-            FileOutputStream fos = new FileOutputStream(termToTermIdFile);
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+            FileOutputStream fos = new FileOutputStream("termToTermIdMap.ser");
 
-            for (String term : termtoTermIdMap.keySet()) {
-                String s = term + "," + termtoTermIdMap.get(term);
-                bw.write(s);
-                bw.newLine();
-            }
-            bw.close();
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+
+            oos.writeObject(termtoTermIdMap);
+            oos.close();
+            fos.close();
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -321,19 +332,14 @@ public class IndexBuilder {
     }
 
     public void writeUrlIdMapToDisk() {
-        String urlToUrlIdFilePath = "urlToUrlIdMap.txt";
-
         try {
-            File urlToUrlIdFile = new File(urlToUrlIdFilePath);
-            FileOutputStream fos = new FileOutputStream(urlToUrlIdFile);
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+            FileOutputStream fos = new FileOutputStream("urlToUrlIdMap.ser");
 
-            for (String url : urlIdMap.keySet()) {
-                String s = url + "," + urlIdMap.get(url);
-                bw.write(s);
-                bw.newLine();
-            }
-            bw.close();
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+
+            oos.writeObject(urlIdMap);
+            oos.close();
+            fos.close();
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();

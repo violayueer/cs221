@@ -3,45 +3,50 @@ package SearchEngine.Service;
 import SearchEngine.Dao.PageDao;
 import Stats.TextTokenizer;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
 import java.util.*;
 
 /**
  * Created by Yue on 3/5/17.
  */
 public class PageService {
-    private TextTokenizer textTokenizer;
+    private static String baseFilepath = new File("").getAbsolutePath();
+    private static String TFIDFMapFilePath = baseFilepath + "/TFIDFMap.ser";
+    private static String termtoTermIdMapFilePath = baseFilepath + "/termToTermIdMap.ser";
+    private static String urltoUrlIdMapFilePath = baseFilepath + "/urlToUrlIdMap.ser";
 
     // term - termId map
-    private Map<String, Integer> termtoTermIdMap = new HashMap<String, Integer>();
-    private Map<Integer, String> termIdtoTermMap = new HashMap<Integer, String>();
+    private static Map<String, Integer> termtoTermIdMap = deserializeMap(termtoTermIdMapFilePath);
+    private static Map<Integer, String> termIdtoTermMap = new HashMap<Integer, String>();
 
     // url - urlId map
-    private Map<String, Integer> urltoUrlIdMap = new HashMap<String, Integer>();
-    private Map<Integer, String> urlIdtoUrlMap = new HashMap<>();
+    private static Map<String, Integer> urltoUrlIdMap = deserializeMap(urltoUrlIdMapFilePath);
+    private static Map<Integer, String> urlIdtoUrlMap = new HashMap<>();
 
     // Map<termId, Map<urlId, tfidf>>
-    private Map<Integer, Map<Integer, Double>> TFIDFMap = new HashMap<Integer, Map<Integer, Double>>();
+    private static Map<Integer, Map<Integer, Double>> TFIDFMap = deserializeMap(TFIDFMapFilePath);
 
-    public PageService(TextTokenizer textTokenizer) {
-        this.textTokenizer = textTokenizer;
-        loadTermAndIdMapFromDisk();
-        loadTFIDFMapFromDisk();
-        loadUrlAndIdMapFromDisk();
+    private TextTokenizer textTokenizer;
+
+    public PageService() {
+        this.textTokenizer = new TextTokenizer();
+
+        //construct urltoUrlIdMap
+        constructIdMap(urlIdtoUrlMap, urltoUrlIdMap);
     }
 
     public List<PageDao> getPageList(String query, int topK) {
         List<PageDao> pageList = new ArrayList<>();
 
         // store urlId, page according to higher totalScore
-        TreeMap<Integer, PageDao> pageMap = new TreeMap(new Comparator<PageDao>() {
+        Map<Integer, PageDao> pageMap = new HashMap<>();
+
+        PriorityQueue<PageDao> pageQueue = new PriorityQueue(topK, new Comparator<PageDao>() {
             @Override
             public int compare(PageDao p1, PageDao p2) {
                 double score1 = p1.getTotalScore();
                 double score2 = p2.getTotalScore();
-                return -1 * Double.compare(score1, score2);
+                return Double.compare(score1, score2);
             }
         });
 
@@ -77,36 +82,58 @@ public class PageService {
 
         // add topK pages to pageList
         for (Integer urlId : pageMap.keySet()) {
-            if (pageList.size() == topK) {
-                break;
+            if (pageQueue.size() == topK) {
+                pageQueue.poll();
             }
-            pageList.add(pageMap.get(urlId));
-        }
+            pageQueue.add(pageMap.get(urlId));
 
+        }
+        for (int i = 0; i < topK; i++) {
+            pageList.add(0, pageQueue.poll());
+        }
+        //pageList.addAll(pageQueue);
+        //Collections.reverse(pageList);
         return pageList;
     }
 
-    public void loadTermAndIdMapFromDisk() {
-        String baseFilepath = new File("").getAbsolutePath();
-
-        String termToTermIdFilePath = baseFilepath + "/termToTermIdMap.txt";
-
+    public static Map deserializeMap(String mapFilePath) {
+        Map map = null;
         try {
-            Scanner in =  new Scanner(new FileReader(termToTermIdFilePath));
+            FileInputStream fis = new FileInputStream(mapFilePath);
 
-            while (in.hasNextLine()) {
-                String line = in.nextLine();
-                String[] strs = line.split(",");
-                termtoTermIdMap.put(strs[0], Integer.parseInt(strs[1]));
-                termIdtoTermMap.put(Integer.parseInt(strs[1]), strs[0]);
-            }
+            ObjectInputStream ois = new ObjectInputStream(fis);
+
+            map = (Map)ois.readObject();
+            ois.close();
+            fis.close();
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return map;
+    }
+
+    public void constructIdMap(Map<Integer, String> targetMap, Map<String, Integer> sourceMap) {
+        for (String s : sourceMap.keySet()) {
+            targetMap.put(sourceMap.get(s), s);
         }
     }
 
-    public void loadUrlAndIdMapFromDisk() {
+    public static void main(String[] args) {
+        PageService p = new PageService();
+        List<PageDao> list = p.getPageList("machine learning", 5);
+
+        for (PageDao pageDao : list) {
+            System.out.println(pageDao.getUrl() + "," + pageDao.getTotalScore());
+        }
+    }
+
+
+    /*public void loadUrlAndIdMapFromDisk() {
         String baseFilepath = new File("").getAbsolutePath();
 
         String termToTermIdFilePath = baseFilepath + "/urlToUrlIdMap.txt";
@@ -156,5 +183,5 @@ public class PageService {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 }

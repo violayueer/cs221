@@ -14,7 +14,7 @@ public class TextTokenizer {
 
         stopWords = new HashSet<String>();
         String filepath = new File("").getAbsolutePath();
-        File stopWordListFile = new File(filepath + "/src/main/java/longStopWordList.txt");
+        File stopWordListFile = new File(filepath + "/src/longStopWordList.txt");
         loadStopWordList(stopWordListFile);
     }
 

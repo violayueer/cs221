@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_cs221" default="compile.module.cs221">
+  <dirname property="module.cs221.basedir" file="${ant.file.module_cs221}"/>
+  
+  <property name="module.jdk.home.cs221" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.cs221" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.cs221" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.cs221" value="-encoding UTF-8 -source 8 -target 8 ${compiler.args}"/>
+  
+  <property name="cs221.output.dir" value="${module.cs221.basedir}/out/production/cs221"/>
+  <property name="cs221.testoutput.dir" value="${module.cs221.basedir}/out/test/cs221"/>
+  
+  <path id="cs221.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="cs221.module.production.classpath">
+    <path refid="${module.jdk.classpath.cs221}"/>
+    <path refid="library.jsoup-1.10.2.classpath"/>
+  </path>
+  
+  <path id="cs221.runtime.production.module.classpath">
+    <pathelement location="${cs221.output.dir}"/>
+    <path refid="library.jsoup-1.10.2.classpath"/>
+  </path>
+  
+  <path id="cs221.module.classpath">
+    <path refid="${module.jdk.classpath.cs221}"/>
+    <pathelement location="${cs221.output.dir}"/>
+    <path refid="library.jsoup-1.10.2.classpath"/>
+  </path>
+  
+  <path id="cs221.runtime.module.classpath">
+    <pathelement location="${cs221.testoutput.dir}"/>
+    <pathelement location="${cs221.output.dir}"/>
+    <path refid="library.jsoup-1.10.2.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.cs221">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.cs221">
+    <patternset refid="excluded.from.module.cs221"/>
+  </patternset>
+  
+  <path id="cs221.module.sourcepath">
+    <dirset dir="${module.cs221.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.cs221" depends="compile.module.cs221.production,compile.module.cs221.tests" description="Compile module cs221"/>
+  
+  <target name="compile.module.cs221.production" depends="register.custom.compilers" description="Compile module cs221; production classes">
+    <mkdir dir="${cs221.output.dir}"/>
+    <javac2 destdir="${cs221.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.cs221}/javac">
+      <compilerarg line="${compiler.args.cs221}"/>
+      <bootclasspath refid="cs221.module.bootclasspath"/>
+      <classpath refid="cs221.module.production.classpath"/>
+      <src refid="cs221.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.cs221"/>
+    </javac2>
+    
+    <copy todir="${cs221.output.dir}">
+      <fileset dir="${module.cs221.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.cs221.tests" depends="register.custom.compilers,compile.module.cs221.production" description="compile module cs221; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.cs221" description="cleanup module">
+    <delete dir="${cs221.output.dir}"/>
+    <delete dir="${cs221.testoutput.dir}"/>
+  </target>
+</project>

@@ -5,6 +5,7 @@ import org.jsoup.nodes.Document;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.DoubleBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -34,7 +35,8 @@ public class Test {
     }
 
     public static void main(String[] args) {
-        Test t = new Test();
-        t.test();
+        //Test t = new Test();
+        //t.test();
+        System.out.println(Double.compare(8.266838660138669, 7.659937182965889));
     }
 }

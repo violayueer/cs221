@@ -23,6 +23,30 @@ public class ReduceFrequencyCount {
     * */
     public void reduceCounts(String filePath1, String filePath2, String outputFilePath) {
         try {
+            //Map<termId, Map<urlId, positionList>
+            /*Map<Integer, Map<Integer, List<Integer>>> TFMap1 = deserializeMap(filePath1);
+            Map<Integer, Map<Integer, List<Integer>>> TFMap2 = deserializeMap(filePath2);
+
+            for (Integer termId : TFMap2.keySet()) {
+                if (TFMap1.containsKey(termId)) {
+                    Map<Integer, List<Integer>> posMap1 = TFMap1.get(termId);
+                    Map<Integer, List<Integer>> posMap2 = TFMap2.get(termId);
+
+                    posMap1.putAll(posMap2);
+                    TFMap1.put(termId, posMap1);
+                }else {
+                    TFMap1.put(termId, TFMap2.get(termId));
+                }
+            }
+
+            FileOutputStream fos = new FileOutputStream(outputFilePath);
+
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+
+            oos.writeObject(TFMap1);
+            oos.close();
+            fos.close();*/
+
             Scanner in1 =  new Scanner(new FileReader(filePath1));
             Scanner in2 =  new Scanner(new FileReader(filePath2));
 
@@ -105,6 +129,27 @@ public class ReduceFrequencyCount {
         } catch (IOException e1) {
             e1.printStackTrace();
         }
+    }
+
+    public Map deserializeMap(String mapFilePath) {
+        Map map = null;
+        try {
+            FileInputStream fis = new FileInputStream(mapFilePath);
+
+            ObjectInputStream ois = new ObjectInputStream(fis);
+
+            map = (Map)ois.readObject();
+            ois.close();
+            fis.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return map;
     }
 
     public void buildPosMap(Map<Integer, List<Integer>> posMap, String[] strs, int i) {
