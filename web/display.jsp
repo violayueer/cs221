@@ -7,7 +7,7 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.List" %>
-<%@ page import="process.PageDao" %>
+<%@ page import="SearchEngine.Dao.PageDao" %>
 <html>
 <head>
     <title>
