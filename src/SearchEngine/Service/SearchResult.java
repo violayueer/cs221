@@ -1,4 +1,4 @@
-package process;
+package SearchEngine.Service;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
