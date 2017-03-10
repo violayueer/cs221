@@ -1,0 +1,23 @@
+#searchDiv{
+    width:800px;
+    height: 140px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 200px;
+}
+h1{
+    text-align: center;
+    color: firebrick;
+}
+form{
+    margin: 0px;
+}
+input{
+    width:600px;
+    height:34px;
+    margin-left:100px;
+    margin-right: 100px;
+    padding-left: 8px;
+    padding-right: 8px;
+    font-size: 18px;
+}
