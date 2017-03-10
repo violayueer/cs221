@@ -21,8 +21,8 @@ public class SearchResult extends HttpServlet{
 
         String query = request.getParameter("query");
 
-        ResultList results = new ResultList();
-        List<PageDao> list = results.resultList(query);
+        PageService results = new PageService();
+        List<PageDao> list = results.getPageList(query, 10);
 
         request.setAttribute("list", list);
         request.setAttribute("query", query);
