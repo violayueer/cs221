@@ -17,7 +17,8 @@ import java.util.*;
  */
 public class IndexBuilder {
     private Map<String, Integer> urlIdMap = new HashMap<String, Integer>();
-
+    //url-title map
+     private Map<String,String> urlTitleMap=new HashMap<String, String>();
     // term - termId map
     private Map<String, Integer> termtoTermIdMap = new HashMap<String, Integer>();
     //private Map<Integer, String> termIdtoTermMap = new HashMap<Integer, String>();
@@ -79,7 +80,7 @@ public class IndexBuilder {
                         //System.out.println(fileNamePath + "-----" + contents);
                         Document doc = Jsoup.parse(cleanHtml);
                         String docText = doc.text();
-
+                        buildUrlTitleMap(url,contents);
                         buildInvertedIndex(urlIdMap.get(url), docText);
 
                         // calculate the TFMap size
@@ -168,6 +169,22 @@ public class IndexBuilder {
         if (!urlIdMap.containsKey(url)) {
             urlIdMap.put(url, urlIdMap.size());
         }
+    }
+     public void buildUrlTitleMap(String contents, String url){
+        try{
+      	  if(contents!=null&&!contents.isEmpty()){
+     		  Document doc = Jsoup.parse(contents);        			  
+      		  String title=doc.title();
+      		  if(title.length()==0){
+      			  title="";
+      		  }
+      		  if(!urlTitleMap.containsKey(url)){
+      			urlTitleMap.put(url,title);
+      		  }  
+      	  }	  	
+        }catch(Exception e){
+        	 e.printStackTrace();
+        }  	
     }
 
     public int buildInvertedIndex(int urlId, String text) {
