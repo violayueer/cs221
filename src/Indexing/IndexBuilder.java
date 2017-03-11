@@ -364,6 +364,22 @@ public class IndexBuilder {
             e.printStackTrace();
         }
     }
+      public void writeUrlTitleMapToDisk() {
+        try {
+            FileOutputStream fos = new FileOutputStream("urlTitleMap.ser");
+
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+
+            oos.writeObject(urlTitleMap);
+            oos.close();
+            fos.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+}
 
     public static void main(String[] args) {
         IndexBuilder id = new IndexBuilder();
