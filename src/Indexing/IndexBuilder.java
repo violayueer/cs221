@@ -18,7 +18,7 @@ import java.util.*;
 public class IndexBuilder {
     private Map<String, Integer> urlIdMap = new HashMap<String, Integer>();
     //url-title map
-     private Map<String,String> urlTitleMap=new HashMap<String, String>();
+     private Map<Integer,String> urlTitleMap=new HashMap<String, String>();
     // term - termId map
     private Map<String, Integer> termtoTermIdMap = new HashMap<String, Integer>();
     //private Map<Integer, String> termIdtoTermMap = new HashMap<Integer, String>();
@@ -172,6 +172,7 @@ public class IndexBuilder {
     }
      public void buildUrlTitleMap(String url, String contents){
        String title="";
+       int urlId=urlIdMap.get(url);
          try{      	  
      		  Document doc = Jsoup.parse(contents);        			  
       		  title=doc.title();
@@ -179,8 +180,8 @@ public class IndexBuilder {
         }catch(Exception e){
         	 e.printStackTrace();
         } 
-        if(!urlTitleMap.containsKey(url)){
-      		urlTitleMap.put(url,title);
+        if(!urlTitleMap.containsKey(urlId)){
+      		urlTitleMap.put(urlId,title);
         } 
     }
 
