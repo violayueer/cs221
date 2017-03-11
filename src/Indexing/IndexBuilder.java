@@ -170,21 +170,18 @@ public class IndexBuilder {
             urlIdMap.put(url, urlIdMap.size());
         }
     }
-     public void buildUrlTitleMap(String contents, String url){
-        try{
-      	  if(contents!=null&&!contents.isEmpty()){
+     public void buildUrlTitleMap(String url, String contents){
+       String title="";
+         try{      	  
      		  Document doc = Jsoup.parse(contents);        			  
-      		  String title=doc.title();
-      		  if(title.length()==0){
-      			  title="";
-      		  }
-      		  if(!urlTitleMap.containsKey(url)){
-      			urlTitleMap.put(url,title);
-      		  }  
-      	  }	  	
+      		  title=doc.title();
+  	
         }catch(Exception e){
         	 e.printStackTrace();
-        }  	
+        } 
+        if(!urlTitleMap.containsKey(url)){
+      		urlTitleMap.put(url,title);
+        } 
     }
 
     public int buildInvertedIndex(int urlId, String text) {
