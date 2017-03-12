@@ -10,10 +10,12 @@ import java.util.*;
  * Created by Yue on 3/5/17.
  */
 public class PageService {
-    private static String baseFilepath = new File("").getAbsolutePath();
+    private static String baseFilepath = "/Users/Yue/IdeaProjects/cs221_new";
+
     private static String TFIDFMapFilePath = baseFilepath + "/TFIDFMap.ser";
     private static String termtoTermIdMapFilePath = baseFilepath + "/termToTermIdMap.ser";
     private static String urltoUrlIdMapFilePath = baseFilepath + "/urlToUrlIdMap.ser";
+    private static String urlTitleMapFilePath = baseFilepath + "/urlTitleMap.ser";
 
     // term - termId map
     private static Map<String, Integer> termtoTermIdMap = deserializeMap(termtoTermIdMapFilePath);
@@ -25,6 +27,9 @@ public class PageService {
 
     // Map<termId, Map<urlId, tfidf>>
     private static Map<Integer, Map<Integer, Double>> TFIDFMap = deserializeMap(TFIDFMapFilePath);
+
+    // urlId-title map
+    private static Map<Integer,String> urlTitleMap = deserializeMap(urlTitleMapFilePath);
 
     private TextTokenizer textTokenizer;
 
@@ -70,9 +75,12 @@ public class PageService {
                     page = new PageDao();
                     String url = urlIdtoUrlMap.get(urlId);
 
+                    String title = urlTitleMap.get(urlId);
+
                     page.setUrlId(urlId);
                     page.setUrl(url);
                     page.setTfidf(tfidf);
+                    page.setTitle(title);
 
                     pageMap.put(urlId, page);
                 }

@@ -11,14 +11,28 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by Yue on 2/26/17.
  */
 public class IndexBuilder {
+    private static String baseFilepath;
+
+    static {
+        try {
+            baseFilepath = new File(".").getCanonicalPath();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private Map<String, Integer> urlIdMap = new HashMap<String, Integer>();
+
     //url-title map
-     private Map<Integer,String> urlTitleMap=new HashMap<String, String>();
+    private Map<Integer,String> urlTitleMap = new HashMap<Integer, String>();
+
     // term - termId map
     private Map<String, Integer> termtoTermIdMap = new HashMap<String, Integer>();
     //private Map<Integer, String> termIdtoTermMap = new HashMap<Integer, String>();
@@ -43,8 +57,8 @@ public class IndexBuilder {
     }
 
     public void initialize() {
-        String filepath = new File("").getAbsolutePath();
-        filepath = filepath.concat("/src/WEBPAGES_RAW/");
+        //String filepath = new File("").getAbsolutePath();
+        String filepath = baseFilepath.concat("/WEBPAGES_RAW/");
 
         String bookkeepingFilePath = filepath.concat("bookkeeping.tsv");
 
@@ -80,7 +94,7 @@ public class IndexBuilder {
                         //System.out.println(fileNamePath + "-----" + contents);
                         Document doc = Jsoup.parse(cleanHtml);
                         String docText = doc.text();
-                        buildUrlTitleMap(url,contents);
+                        buildUrlTitleMap(url, contents);
                         buildInvertedIndex(urlIdMap.get(url), docText);
 
                         // calculate the TFMap size
@@ -95,11 +109,15 @@ public class IndexBuilder {
                 }
 
             }
+            writeUrlTitleMapToDisk();
+
             int roundNum = mergeBlock(0, blockNum);
             computeTFIDF(urlIdMap.size(), roundNum);
 
             writeTermAndIdMaptoDisk();
             writeUrlIdMapToDisk();
+
+            writeUrlTitleMapToDisk();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -139,7 +157,7 @@ public class IndexBuilder {
         if (blockCount == 1) {
             return roundNum;
         }
-        String baseFilepath = new File("").getAbsolutePath();
+        //String baseFilepath = new File("").getAbsolutePath();
         int count = 0;
 
         for (int i = 0; i < blockCount - 1; i += 2) {
@@ -170,16 +188,26 @@ public class IndexBuilder {
             urlIdMap.put(url, urlIdMap.size());
         }
     }
-     public void buildUrlTitleMap(String url, String contents){
-       String title="";
-       int urlId=urlIdMap.get(url);
-         try{      	  
-     		  Document doc = Jsoup.parse(contents);        			  
-      		  title=doc.title();
-  	
-        }catch(Exception e){
-        	 e.printStackTrace();
-        } 
+    public void buildUrlTitleMap(String url, String contents){
+        /*Document doc = null;
+        try {
+            doc = Jsoup.connect("http://" + url).get();
+        } catch (IOException e) {
+            //e.printStackTrace();
+
+            System.out.println("Illegal url: " + url + ", skip");
+        }
+        String title = doc.title();*/
+        contents = contents.replaceAll("\\s+", " ");
+        Pattern p = Pattern.compile("<title>(.*?)</title>", Pattern.CASE_INSENSITIVE);
+        Matcher m = p.matcher(contents);
+
+        String title = "";
+        while (m.find() == true) {
+            title = m.group(1);
+        }
+        int urlId=urlIdMap.get(url);
+
         if(!urlTitleMap.containsKey(urlId)){
       		urlTitleMap.put(urlId,title);
         } 
@@ -244,7 +272,7 @@ public class IndexBuilder {
     }
 
     public void computeTFIDF(int urlCount, int roundNum) {
-        String baseFilepath = new File("").getAbsolutePath();
+        //String baseFilepath = new File("").getAbsolutePath();
         String filePath = baseFilepath + "/round" + roundNum + "_block0.txt";
         //int count = 0;
 
@@ -362,7 +390,8 @@ public class IndexBuilder {
             e.printStackTrace();
         }
     }
-      public void writeUrlTitleMapToDisk() {
+
+    public void writeUrlTitleMapToDisk() {
         try {
             FileOutputStream fos = new FileOutputStream("urlTitleMap.ser");
 
@@ -377,7 +406,7 @@ public class IndexBuilder {
         } catch (IOException e) {
             e.printStackTrace();
         }
-}
+    }
 
     public static void main(String[] args) {
         IndexBuilder id = new IndexBuilder();

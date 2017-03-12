@@ -6,8 +6,13 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.List" %>
 <%@ page import="SearchEngine.Dao.PageDao" %>
+<%@ page import="org.jsoup.Jsoup" %>
+<%@ page import="java.io.BufferedReader" %>
+<%@ page import="java.io.InputStreamReader" %>
+<%@ page import="java.net.URL" %>
+<%@ page import="java.net.URLConnection" %>
+<%@ page import="java.util.List" %>
 <html>
 <head>
     <title>
@@ -22,9 +27,26 @@
         for(PageDao item : list){
             %>
             <div class="item">
-                <h1 class="title"><% out.print(item.getTitle());%></h1>
-                <p class="totalScore"><% out.print("Total Score : " + item.getTotalScore());%></p>
-                <a class="url" href = "<% out.print(item.getUrl()); %> " ><% out.print(item.getUrl()); %></a>
+                <h1 class="title"><%= item.getTitle()%></h1>
+                <p class="totalScore"><%= "Total Score : " + item.getTotalScore()%></p>
+                <a class="url" href = "<%= item.getUrl()%> " ><%= item.getUrl() %></a>
+                <div>
+                    <%
+                        URL uri = new URL("http://" + item.getUrl());
+                        URLConnection ec = uri.openConnection();
+                        BufferedReader in = new BufferedReader(new InputStreamReader(ec.getInputStream(), "UTF-8"));
+                        String inputLine;
+                        StringBuilder a = new StringBuilder();
+                        while ((inputLine = in.readLine()) != null) {
+                            a.append(inputLine);
+                        }
+                        in.close();
+
+                        String docText = Jsoup.parse(a.toString()).text();
+                        String showText = docText.length() <= 300 ? docText : docText.substring(0, 300);
+                        out.print(showText);
+                    %>
+                </div>
             </div>
             <%
         }

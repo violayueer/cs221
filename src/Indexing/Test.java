@@ -5,12 +5,9 @@ import org.jsoup.nodes.Document;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.DoubleBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
-import static sun.plugin.javascript.navig.JSType.Document;
 
 /**
  * Created by Yue on 2/26/17.
@@ -18,7 +15,12 @@ import static sun.plugin.javascript.navig.JSType.Document;
 public class Test {
 
     public void test() {
-        String filepath = new File("").getAbsolutePath();
+        String filepath = null;
+        try {
+            filepath = new File(".").getCanonicalPath();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         filepath = filepath.concat("/src/main/java/WEBPAGES_RAW/");
         String fileNamePath = "/Users/Yue/Downloads/view-source_www.ics.uci.edu.txt";
@@ -37,6 +39,11 @@ public class Test {
     public static void main(String[] args) {
         //Test t = new Test();
         //t.test();
-        System.out.println(Double.compare(8.266838660138669, 7.659937182965889));
+        try {
+            System.out.println(new File(".").getCanonicalPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }

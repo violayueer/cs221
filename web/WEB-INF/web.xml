@@ -6,7 +6,7 @@
 
     <servlet>
         <servlet-name>SearchResult</servlet-name>
-        <servlet-class>process.SearchResult</servlet-class>
+        <servlet-class>SearchEngine.Service.SearchResultServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>

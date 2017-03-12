@@ -9,12 +9,13 @@ import java.util.*;
  */
 public class TextTokenizer {
     private Set<String> stopWords;
+    private static String baseFilepath = "/Users/Yue/IdeaProjects/cs221_new";
 
     public TextTokenizer() {
 
         stopWords = new HashSet<String>();
-        String filepath = new File("").getAbsolutePath();
-        File stopWordListFile = new File(filepath + "/src/longStopWordList.txt");
+        //String filepath = new File("").getAbsolutePath();
+        File stopWordListFile = new File(baseFilepath + "/src/longStopWordList.txt");
         loadStopWordList(stopWordListFile);
     }
 

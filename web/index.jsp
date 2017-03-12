@@ -18,6 +18,7 @@
          <h1>ICS Search Engine </h1>
          <form action="${pageContext.request.contextPath}/servlet" method="GET">
              <input type = "text" name = "query">
+             <input type="submit" name="go">
          </form>
     </div>
 </body>
