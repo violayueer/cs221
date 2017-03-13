@@ -4,9 +4,13 @@ import Stats.ReduceFrequencyCount;
 import Stats.TextTokenizer;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.safety.Whitelist;
+import org.jsoup.select.Elements;
 
 import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -141,10 +145,6 @@ public class IndexBuilder {
                     System.out.println("Illegal, skip");
                 }
         	}
-
-            }catch(Exception e){
-            	e.printStackTrace();
-            }
             writeUrlTitleMapToDisk();
 
             int roundNum = mergeBlock(0, blockNum);
@@ -155,28 +155,14 @@ public class IndexBuilder {
 
            
         	writeInMapToDisk();
-            writeOutMapToDisk();
-            
+            writeOutMapToDisk();  	
 
-        }
-                }
-
+            }catch(Exception e){
+            	e.printStackTrace();
             }
-            writeUrlTitleMapToDisk();
-
-            int roundNum = mergeBlock(0, blockNum);
-            computeTFIDF(urlIdMap.size(), roundNum);
-
-            writeTermAndIdMaptoDisk();
-            writeUrlIdMapToDisk();
-
-            writeUrlTitleMapToDisk();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-
+           
         }
-    }
+               
 
     public void writeBlockToDisk() {
         try {
@@ -247,7 +233,6 @@ public class IndexBuilder {
             doc = Jsoup.connect("http://" + url).get();
         } catch (IOException e) {
             //e.printStackTrace();
-
             System.out.println("Illegal url: " + url + ", skip");
         }
         String title = doc.title();*/
@@ -445,25 +430,19 @@ public void buildFinalUrlMap(String url){
             File outPutFile = new File("invertedIndex.txt");
             FileOutputStream fos = new FileOutputStream(outPutFile);
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
-
             // InvertedIndex: termId, TF, docId, TFIDF
             for (Integer termId : TFIDFMap.keySet()) {
                 StringBuilder sb = new StringBuilder("");
                 sb.append(termId + "," + TFIDFMap.get(termId).size() + ",");
-
                 Map<Integer, Double> map = TFIDFMap.get(termId);
                 //sb.append(", TFIDF: ");
-
                 for (Integer urlId : map.keySet()) {
                     sb.append(urlId + "," + map.get(urlId) + ",");
                 }
-
                 bw.write(sb.toString());
                 bw.newLine();
             }
-
             bw.close();
-
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
