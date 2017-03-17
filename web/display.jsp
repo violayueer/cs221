@@ -6,7 +6,7 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="SearchEngine.Dao.PageDao" %>
+<%@ page import="Searching.PageDao" %>
 <%@ page import="org.jsoup.Jsoup" %>
 <%@ page import="java.io.BufferedReader" %>
 <%@ page import="java.io.InputStreamReader" %>
@@ -20,37 +20,44 @@
     </title>
     <link rel="stylesheet" href="../CSS/display.css" type="text/css" />
 </head>
+
 <body>
-    <div id="pageList">
+<div id="header">
+    <img id="logo" src="../CSS/logo.png" />
+    <form action="${pageContext.request.contextPath}/servlet" method="GET">
+        <input type = "text" name = "query">
+    </form>
+</div>
+
+<div id="pageList">
     <%
         List<PageDao> list = (List<PageDao>) request.getAttribute("list");
         for(PageDao item : list){
-            %>
-            <div class="item">
-                <h1 class="title"><%= item.getTitle()%></h1>
-                <p class="totalScore"><%= "Total Score : " + item.getTotalScore()%></p>
-                <a class="url" href = "<%= item.getUrl()%> " ><%= item.getUrl() %></a>
-                <div>
-                    <%
-                        URL uri = new URL("http://" + item.getUrl());
-                        URLConnection ec = uri.openConnection();
-                        BufferedReader in = new BufferedReader(new InputStreamReader(ec.getInputStream(), "UTF-8"));
-                        String inputLine;
-                        StringBuilder a = new StringBuilder();
-                        while ((inputLine = in.readLine()) != null) {
-                            a.append(inputLine);
-                        }
-                        in.close();
-
-                        String docText = Jsoup.parse(a.toString()).text();
-                        String showText = docText.length() <= 300 ? docText : docText.substring(0, 300);
-                        out.print(showText);
-                    %>
-                </div>
-            </div>
+    %>
+    <div class="item">
+        <h1 class="title"><%= item.getTitle()%></h1>
+        <a class="url" href = "<%= item.getUrl()%> " ><%= item.getUrl() %></a>
+        <div class="text">
             <%
+                URL uri = new URL("http://" + item.getUrl());
+                URLConnection ec = uri.openConnection();
+                BufferedReader in = new BufferedReader(new InputStreamReader(ec.getInputStream(), "UTF-8"));
+                String inputLine;
+                StringBuilder a = new StringBuilder();
+                while ((inputLine = in.readLine()) != null) {
+                    a.append(inputLine);
+                }
+                in.close();
+                String docText = Jsoup.parse(a.toString()).text();
+                String showText = docText.length() <= 300 ? docText : docText.substring(0, 300);
+                out.print(showText);
+            %>
+        </div>
+        <p class="totalScore"><%= "Total Score : " + item.getTotalScore()%></p>
+    </div>
+    <%
         }
     %>
-    </div>
+</div>
 </body>
 </html>
