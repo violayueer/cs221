@@ -48,9 +48,11 @@ public class IndexBuilder {
     
     //outpage map
     private Map<Integer,HashSet<Integer>> outMap=new HashMap<Integer,HashSet<Integer>>();
-    
     //inpage map
-     private Map<Integer,HashSet<Integer>> inMap=new HashMap<Integer,HashSet<Integer>>();
+    private Map<Integer,HashSet<Integer>> inMap=new HashMap<Integer,HashSet<Integer>>();
+
+    // maps for page rank
+    public Map<Integer, Double> pageRankMap = new HashMap<>();
     
     // term - termId map
     private Map<String, Integer> termtoTermIdMap = new HashMap<String, Integer>();
@@ -60,6 +62,10 @@ public class IndexBuilder {
     private TreeMap<Integer, Map<Integer, List<Integer>>> TFMap = new TreeMap<Integer, Map<Integer, List<Integer>>>();
     private Map<String, Integer> DFMap = new HashMap<String, Integer>();
     private TreeMap<Integer, Map<Integer, Double>> TFIDFMap = new TreeMap<Integer, Map<Integer, Double>>();
+
+    private Map<Integer, Integer> urlDocLengthMap = new HashMap<>();
+
+    private Map<Integer, Integer> termFrequencyMap = new HashMap<>();
 
     private TextTokenizer textTokenizer;
     private ReduceFrequencyCount reduceFrequencyCount;
@@ -97,71 +103,83 @@ public class IndexBuilder {
                 String url = strs[1];
                 buildUrlIdMap(url);
                 buildUrlPathMap(url,fileNamePath);
-                }
-            }catch (IOException e) {
-                 e.printStackTrace();
             }
+        }catch (IOException e) {
+             e.printStackTrace();
+        }
     }
       
-        public void buildUrlPathMap(String url,String path){
-        	if(!urlPathMap.containsKey(url)){
-        		urlPathMap.put(url, path);
-        	}
+    public void buildUrlPathMap(String url,String path){
+        if(!urlPathMap.containsKey(url)){
+            urlPathMap.put(url, path);
         }
-          public void readData(){
-        	int k=0;
-        	try{
-              	for(String url:urlIdMap.keySet()){
-              		k++;
-              		String fileNamePath=urlPathMap.get(url);
-              		fileNamePath=filepath + fileNamePath;
-              		String contents = new String(Files.readAllBytes(Paths.get(fileNamePath)), StandardCharsets.UTF_8);        
-              		buildFinalUrlMap(url); 	
+    }
+
+    public void readData(){
+        int k = 0;
+        try{
+            for(String url : urlIdMap.keySet()){
+                k++;
+                String fileNamePath = urlPathMap.get(url);
+                fileNamePath = filepath + fileNamePath;
+
+                String contents = new String(Files.readAllBytes(Paths.get(fileNamePath)), StandardCharsets.UTF_8);
+                buildFinalUrlMap(url);
+
                 if (8 * (int) ((((contents.length()) * 2) + 45) / 8) > 1000000) {
                     continue;
                 }
 
                 //using jsoup to remove tags from html
                 try {
-                	System.out.println(fileNamePath);
+                    System.out.println(fileNamePath);
                     String cleanHtml = Jsoup.clean(contents, Whitelist.relaxed());
 
                     if (cleanHtml != null && cleanHtml.length() != 0) {
                         //System.out.println(fileNamePath + "-----" + contents);
-                    	Document doc = Jsoup.parse(contents);//cleanHtml
-                    	String docText = doc.text();
-                    	 buildInvertedIndex(urlIdMap.get(url), docText);
-                    	 buildUrlTitleMap(url,contents);
-                    	 buildoutlinkMap(url,contents);
+                        Document doc = Jsoup.parse(contents);//cleanHtml
+                        String docText = doc.text();
+                        buildInvertedIndex(urlIdMap.get(url), docText);
+                        buildUrlTitleMap(url,contents);
+                        buildoutlinkMap(url,contents);
                        // calculate the TFMap size
                     //  long noBytes = MemoryUtil.deepMemoryUsageOf(TFMap);
                         // if TFMap size reach block size limit, then write block to disk
-                         if (Runtime.getRuntime().freeMemory() < 1000 || k==urlIdMap.size()) {
-                             writeBlockToDisk();
-                         }
-                    	}
-                	
+                        if (Runtime.getRuntime().freeMemory() < 1000 || k==urlIdMap.size()) {
+                            writeBlockToDisk();
+                        }
+                    }
+
                 }catch (Exception e) {
                     System.out.println("Illegal, skip");
                 }
-        	}
-            writeUrlTitleMapToDisk();
+            }
+            writeMapToDisk("urlDocLengthMap.ser", urlDocLengthMap);
+            writeMapToDisk("termFrequencyMap.ser", termFrequencyMap);
+
+            //writeUrlTitleMapToDisk();
+            writeMapToDisk("urlTitleMap.ser", urlTitleMap);
 
             int roundNum = mergeBlock(0, blockNum);
             computeTFIDF(urlIdMap.size(), roundNum);
 
-            writeTermAndIdMaptoDisk();
-            writeUrlIdMapToDisk();
+            //writeTermAndIdMaptoDisk();
+            //writeUrlIdMapToDisk();
 
-           
-        	writeInMapToDisk();
-            writeOutMapToDisk();  	
+            writeMapToDisk("termToTermIdMap.ser", termtoTermIdMap);
+            writeMapToDisk("urlToUrlIdMap.ser", urlIdMap);
 
-            }catch(Exception e){
-            	e.printStackTrace();
-            }
-           
+            //writeInMapToDisk();
+            //writeOutMapToDisk();
+
+            writeMapToDisk("inMap.ser", inMap);
+            writeMapToDisk("outMap.ser", outMap);
+
+        }catch(Exception e){
+            e.printStackTrace();
         }
+
+    }
                
 
     public void writeBlockToDisk() {
@@ -181,6 +199,7 @@ public class IndexBuilder {
             }
             bw.close();
             blockNum++;
+            buildTermFrequencyMap();
             TFMap.clear();
             TFMapMemoUsage = 0;
 
@@ -227,6 +246,7 @@ public class IndexBuilder {
             urlIdMap.put(url, urlIdMap.size());
         }
     }
+
     public void buildUrlTitleMap(String url, String contents){
         /*Document doc = null;
         try {
@@ -250,7 +270,8 @@ public class IndexBuilder {
       		urlTitleMap.put(urlId,title);
         } 
     }
-public void buildFinalUrlMap(String url){
+
+    public void buildFinalUrlMap(String url){
     	String domain=(url.split("/"))[0];
     	String p="http://";
     	String finalUrl=domain;
@@ -259,18 +280,19 @@ public void buildFinalUrlMap(String url){
     		int Id=tempDomainMap.get(domain);
     		finalUrl=finalUrlMap.get(Id);
     	}else{
-    		 try{
-			 HttpURLConnection con = (HttpURLConnection) new URL(p+domain).openConnection();
-			 con.setInstanceFollowRedirects(false);
-			 con.connect();	
-			 finalUrl=con.getHeaderField("Location").toString().substring(p.length());			 
-		 }catch(Exception e){
-			 System.err.println(e);
-		 }
+            try{
+                HttpURLConnection con = (HttpURLConnection) new URL(p+domain).openConnection();
+                con.setInstanceFollowRedirects(false);
+                con.connect();
+                finalUrl=con.getHeaderField("Location").toString().substring(p.length());
+            }catch(Exception e){
+                System.err.println(e);
+            }
     	}		
     	finalUrlMap.put(urlId,finalUrl);
     	tempDomainMap.put(domain, urlId);
     }
+
     public void buildoutlinkMap(String url,String contents){
         int urlId=urlIdMap.get(url);
         if(!outMap.containsKey(urlId)){
@@ -297,12 +319,12 @@ public void buildFinalUrlMap(String url){
         				 }       			        				 
         			  }
         			  if(!outurl.equals(url)&&urlIdMap.containsKey(outurl)){
-        				int Id=urlIdMap.get(outurl);
-        				outMap.get(urlId).add(Id);        	       					
-        				if(!inMap.containsKey(Id)){
-        						inMap.put(Id, new HashSet<Integer>());
-        					}
-        					inMap.get(Id).add(urlId);        	     					     					       					  
+                          int Id=urlIdMap.get(outurl);
+                          outMap.get(urlId).add(Id);
+                          if(!inMap.containsKey(Id)){
+                              inMap.put(Id, new HashSet<Integer>());
+                          }
+                          inMap.get(Id).add(urlId);
         			  }        				        			       		
         		  }
         		  if(outMap.get(urlId).size()!=0){
@@ -310,14 +332,18 @@ public void buildFinalUrlMap(String url){
         		  }
         		  
         	  }	  	
-          }catch(Exception e){
-          	 e.printStackTrace();
-          }  
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
     public int buildInvertedIndex(int urlId, String text) {
         List<String> tokenList = textTokenizer.tokenize(text);
         //Set<String> currDocTokenSet = new HashSet<String>();
+
+        if (!urlDocLengthMap.containsKey(urlId)) {
+            urlDocLengthMap.put(urlId, tokenList.size());
+        }
 
         for (int i = 0; i < tokenList.size(); i++) {
             String token = tokenList.get(i);
@@ -368,6 +394,7 @@ public void buildFinalUrlMap(String url){
                 }*/
 
             }
+
             //posMap.clear();
         }
         return tokenList.size();
@@ -451,49 +478,40 @@ public void buildFinalUrlMap(String url){
 
     }
 
-    public void writeTermAndIdMaptoDisk() {
-
-        try {
-            FileOutputStream fos = new FileOutputStream("termToTermIdMap.ser");
-
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-
-            oos.writeObject(termtoTermIdMap);
-            oos.close();
-            fos.close();
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+    public void computePageRank(int n) {
+        //initialize pageRankMap
+        for (int urlId : outMap.keySet()) {
+            pageRankMap.put(urlId, 1.0);
         }
 
-    }
+        for (int i = 0; i < n; i++) {
 
-    public void writeUrlIdMapToDisk() {
-        try {
-            FileOutputStream fos = new FileOutputStream("urlToUrlIdMap.ser");
+            for (int urlId : pageRankMap.keySet()) {
+                double pageRank = 0;
+                Set<Integer> inSet = inMap.get(urlId);
 
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
+                if (inSet == null || inSet.size() == 0) {
+                    continue;
+                }
 
-            oos.writeObject(urlIdMap);
-            oos.close();
-            fos.close();
+                for (int inUrlId : inSet) {
+                    pageRank += pageRankMap.get(inUrlId) / (double)outMap.get(inUrlId).size();
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+                }
+                pageRank = pageRank * 0.85 + 0.15;
+                pageRankMap.put(urlId, pageRank);
+            }
         }
     }
 
-    public void writeUrlTitleMapToDisk() {
+
+    public void writeMapToDisk(String filepath, Map outputMap) {
         try {
-            FileOutputStream fos = new FileOutputStream("urlTitleMap.ser");
+            FileOutputStream fos = new FileOutputStream(filepath);
 
             ObjectOutputStream oos = new ObjectOutputStream(fos);
 
-            oos.writeObject(urlTitleMap);
+            oos.writeObject(outputMap);
             oos.close();
             fos.close();
 
@@ -503,45 +521,47 @@ public void buildFinalUrlMap(String url){
             e.printStackTrace();
         }
     }
-    public void writeInMapToDisk() {
-        try {
-            FileOutputStream fos = new FileOutputStream("inMap.ser");
-         
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
 
-            oos.writeObject(inMap);
-            oos.close();
-            fos.close();
+    public void buildTermFrequencyMap() {
+        for (Integer termId : TFMap.keySet()) {
+            termFrequencyMap.put(termId, TFMap.get(termId).size());
+        }
+
+    }
+
+    public Map deserializeMap(String mapFilePath) {
+        Map map = null;
+        try {
+            FileInputStream fis = new FileInputStream(mapFilePath);
+
+            ObjectInputStream ois = new ObjectInputStream(fis);
+
+            map = (Map)ois.readObject();
+            ois.close();
+            fis.close();
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        }
-}
-    public void writeOutMapToDisk() {
-        try {
-            FileOutputStream fos = new FileOutputStream("outMap.ser");
-         
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-
-            oos.writeObject(outMap);
-            oos.close();
-            fos.close();
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-}
+        return map;
+    }
 
     public static void main(String[] args) {
         IndexBuilder id = new IndexBuilder();
         id.initialize();
         id.readData();
         id.outputResult();
-        //id.computeTFIDF(10000, 0);
-        //id.mergeBlock(0, 2);
+
+        //String inMapFilePath = "/Users/Yue/IdeaProjects/cs221_new/inMap.ser";
+        //String outMapFilePath = "/Users/Yue/IdeaProjects/cs221_new/outMap.ser";
+
+        //id.inMap = id.deserializeMap(inMapFilePath);
+        //id.outMap = id.deserializeMap(outMapFilePath);
+        id.computePageRank(30);
+        id.writeMapToDisk("pageRankMap.ser", id.pageRankMap);
     }
 }

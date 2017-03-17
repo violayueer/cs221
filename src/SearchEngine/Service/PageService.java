@@ -16,6 +16,10 @@ public class PageService {
     private static String termtoTermIdMapFilePath = baseFilepath + "/termToTermIdMap.ser";
     private static String urltoUrlIdMapFilePath = baseFilepath + "/urlToUrlIdMap.ser";
     private static String urlTitleMapFilePath = baseFilepath + "/urlTitleMap.ser";
+    private static String pageRankMapFilePath = baseFilepath + "/pageRankMap.ser";
+    private static String outMapFilePath = baseFilepath + "/outMap.ser";
+    private static String termFrequencyMapFilePath = baseFilepath + "/termFrequencyMap.ser";
+    private static String urlDocLengthMapFilePath = baseFilepath + "/urlDocLengthMap.ser";
 
     // term - termId map
     private static Map<String, Integer> termtoTermIdMap = deserializeMap(termtoTermIdMapFilePath);
@@ -30,6 +34,15 @@ public class PageService {
 
     // urlId-title map
     private static Map<Integer,String> urlTitleMap = deserializeMap(urlTitleMapFilePath);
+
+    // pageRank Map
+    public static Map<Integer, Double> pageRankMap = deserializeMap(pageRankMapFilePath);
+
+    //outpage map, used to filter redirect url
+    private static Map<Integer,HashSet<Integer>> outMap = deserializeMap(outMapFilePath);
+
+    private static Map<Integer, Integer> termFrequencyMap = deserializeMap(termFrequencyMapFilePath);
+    private static Map<Integer, Integer> urlDocLengthMap = deserializeMap(urlDocLengthMapFilePath);
 
     private TextTokenizer textTokenizer;
 
@@ -57,11 +70,26 @@ public class PageService {
 
         List<String> queryTerms = textTokenizer.tokenize(query);
 
-        for (String queryTerm : queryTerms) {
+        Set<Integer> urlIdSetWithAllQueryTerms = constructUrlIdSetWithAllQueryTerms(queryTerms);
+
+        for (int i = 0; i < queryTerms.size(); i++) {
+            String queryTerm = queryTerms.get(i);
+
             int queryTermId = termtoTermIdMap.get(queryTerm);
             Map<Integer, Double> TFIDFValues = TFIDFMap.get(queryTermId);
 
-            for (Integer urlId : TFIDFValues.keySet()) {
+            double queryTermTFIDF = computeQueryTFIDF(queryTerm, TFIDFValues.size() + 1);
+
+            for (Integer urlId : urlIdSetWithAllQueryTerms) {
+                // filter redirected url or large url
+                if (!outMap.containsKey(urlId)) {
+                    continue;
+                }
+
+                if (i != 0 && !pageMap.containsKey(urlId)) {
+                    continue;
+                }
+
                 double tfidf = TFIDFValues.get(urlId);
                 PageDao page = null;
 
@@ -74,26 +102,37 @@ public class PageService {
                 }else {
                     page = new PageDao();
                     String url = urlIdtoUrlMap.get(urlId);
-
                     String title = urlTitleMap.get(urlId);
+
+                    computePageUrlScore(page, queryTerms);
 
                     page.setUrlId(urlId);
                     page.setUrl(url);
                     page.setTfidf(tfidf);
                     page.setTitle(title);
+                    page.setPageRank(pageRankMap.get(urlId));
 
                     pageMap.put(urlId, page);
                 }
-                page.computeTotalScore();
+                page.computeTitleScore(query);
+                double cosineSimilarity = page.getCosineSimilarity() + queryTermTFIDF * page.getTfidf();
+                page.setCosineSimilarity(cosineSimilarity);
             }
         }
 
         // add topK pages to pageList
         for (Integer urlId : pageMap.keySet()) {
+            int docLength = urlDocLengthMap.get(urlId);
+
+            PageDao page = pageMap.get(urlId);
+            page.setCosineSimilarity(page.getCosineSimilarity() / (double)docLength);
+
+            page.computeTotalScore();
+
             if (pageQueue.size() == topK) {
                 pageQueue.poll();
             }
-            pageQueue.add(pageMap.get(urlId));
+            pageQueue.add(page);
 
         }
         for (int i = 0; i < topK; i++) {
@@ -102,6 +141,30 @@ public class PageService {
         //pageList.addAll(pageQueue);
         //Collections.reverse(pageList);
         return pageList;
+    }
+
+    public void computePageUrlScore(PageDao page, List<String> queryTerms) {
+        String url = page.getUrl();
+        String[] domains = url.split("/");
+
+        for (String term : queryTerms) {
+            for (String domain : domains) {
+                if (domain.contains(term)) {
+                    page.setUrlScore(page.getUrlScore() + 0.25);
+                }
+            }
+        }
+    }
+
+    public double computeQueryTFIDF(String queryTerm, int df) {
+        int docmentSize = outMap.size();
+
+        int queryTermId = termtoTermIdMap.get(queryTerm);
+        int tf = termFrequencyMap.get(queryTermId);
+
+        double tfidf = Math.log10((double)docmentSize / (double)df) * Math.log(1 + (double)tf);
+
+        return tfidf;
     }
 
     public static Map deserializeMap(String mapFilePath) {
@@ -127,8 +190,42 @@ public class PageService {
 
     public void constructIdMap(Map<Integer, String> targetMap, Map<String, Integer> sourceMap) {
         for (String s : sourceMap.keySet()) {
-            targetMap.put(sourceMap.get(s), s);
+            int urlId = sourceMap.get(s);
+
+            //outMap here is used to filter redirected url
+            if (outMap.containsKey(urlId)) {
+                targetMap.put(sourceMap.get(s), s);
+            }
+
         }
+    }
+
+    public Set<Integer> constructUrlIdSetWithAllQueryTerms(List<String> queryTerms) {
+        Set<Integer> urlIdSet = null;
+
+        for (int i = 0; i < queryTerms.size(); i++) {
+            String queryTerm = queryTerms.get(i);
+            int queryTermId = termtoTermIdMap.get(queryTerm);
+
+            Set<Integer> tempSet = new HashSet<>();
+
+            //Map<Integer, Double> TFIDFValues = TFIDFMap.get(queryTermId);
+            Set<Integer> urlIdsInTFIDFMap = TFIDFMap.get(queryTermId).keySet();
+
+            if (i == 0) {
+                urlIdSet = new HashSet<>(urlIdsInTFIDFMap);
+
+            }else {
+                for (Integer urlId : urlIdSet) {
+                    if (urlIdsInTFIDFMap.contains(urlId)) {
+                        tempSet.add(urlId);
+                    }
+                }
+                urlIdSet = tempSet;
+            }
+
+        }
+        return urlIdSet;
     }
 
     public static void main(String[] args) {

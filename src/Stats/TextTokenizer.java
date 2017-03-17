@@ -10,10 +10,13 @@ import java.util.*;
 public class TextTokenizer {
     private Set<String> stopWords;
     private static String baseFilepath = "/Users/Yue/IdeaProjects/cs221_new";
+    private Stemmer myStemmer;
 
     public TextTokenizer() {
 
         stopWords = new HashSet<String>();
+        myStemmer = new Stemmer();
+
         //String filepath = new File("").getAbsolutePath();
         File stopWordListFile = new File(baseFilepath + "/src/longStopWordList.txt");
         loadStopWordList(stopWordListFile);
@@ -34,7 +37,10 @@ public class TextTokenizer {
                 i++;
             }
             if (token.length() > 0 && !stopWords.contains(token)) {
-                tokenList.add(token.toString());
+                myStemmer.add(token.toString().toCharArray(), token.length());
+                String newToken = myStemmer.toString();
+
+                tokenList.add(newToken);
             }
             i++;
         }

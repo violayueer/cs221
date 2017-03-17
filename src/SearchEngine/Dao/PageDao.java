@@ -1,6 +1,10 @@
 package SearchEngine.Dao;
 
+import Stats.TextTokenizer;
+
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Yue on 3/5/17.
@@ -13,13 +17,15 @@ public class PageDao {
     private double pageRank;
     private double titleScore;
     private double totalScore;
+    private double cosineSimilarity;
+    private double urlScore;
 
     private List<String> snippets;
 
     public PageDao() {
     }
 
-    public PageDao(int urlId, String url, String title, double tfidf, double pageRank, double titleScore, double totalScore, List<String> snippets) {
+    public PageDao(int urlId, String url, String title, double tfidf, double pageRank, double titleScore, double totalScore, double cosineSimilarity, List<String> snippets) {
         this.urlId = urlId;
         this.url = url;
         this.title = title;
@@ -27,12 +33,30 @@ public class PageDao {
         this.pageRank = pageRank;
         this.titleScore = titleScore;
         this.totalScore = totalScore;
+        this.cosineSimilarity = cosineSimilarity;
         this.snippets = snippets;
     }
 
     public double computeTotalScore() {
-        totalScore = tfidf;
-        return totalScore;
+        this.totalScore = this.cosineSimilarity + this.pageRank * (this.titleScore + this.urlScore);
+
+        return this.totalScore;
+    }
+
+    public double getCosineSimilarity() {
+        return cosineSimilarity;
+    }
+
+    public void setCosineSimilarity(double cosineSimilarity) {
+        this.cosineSimilarity = cosineSimilarity;
+    }
+
+    public double getUrlScore() {
+        return urlScore;
+    }
+
+    public void setUrlScore(double urlScore) {
+        this.urlScore = urlScore;
     }
 
     public int getUrlId() {
@@ -72,6 +96,7 @@ public class PageDao {
     }
 
     public void setPageRank(double pageRank) {
+
         this.pageRank = pageRank;
     }
 
@@ -97,5 +122,34 @@ public class PageDao {
 
     public void setSnippets(List<String> snippets) {
         this.snippets = snippets;
+    }
+
+    public double computeTitleScore(String query) {
+        if (query == null || query.length() == 0 || this.title == null || this.title.length() == 0) {
+            return 0.0;
+
+        }
+        TextTokenizer textTokenizer = new TextTokenizer();
+
+        List<String> titleTerms = textTokenizer.tokenize(this.title);
+        List<String> queryTerms = textTokenizer.tokenize(query);
+
+        if (titleTerms.size() == 0 || queryTerms.size() == 0) {
+            this.titleScore = 0.0;
+
+        }else {
+            int intersectCount = 0;
+            Set<String> titleTermSet = new HashSet<>(titleTerms);
+
+            for (String queryTerm : queryTerms) {
+                if (titleTermSet.contains(queryTerm)) {
+                    intersectCount++;
+                }
+            }
+
+            titleTermSet.addAll(queryTerms);
+            this.titleScore = (double)intersectCount / (double)titleTermSet.size();
+        }
+        return this.titleScore;
     }
 }
