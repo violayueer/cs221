@@ -1,0 +1,84 @@
+Mondego Group @ UC Irvine
+http://mondego.ics.uci.edu/
+
+Mondego - UCI Network Data Repository
+http://networkdata.ics.uci.edu/netdata/html/Mondego.html
+
+Code Clone Detection
+http://mondego.ics.uci.edu/projects/clonedetection/
+
+Crista Lopes Home Page at UCI
+http://www.ics.uci.edu/~lopes/
+
+SourcererCC
+http://mondego.ics.uci.edu/projects/SourcererCC/
+
+UC Irvine Machine Learning Repository - UCI Machine Learning ...
+http://archive.ics.uci.edu/ml/
+
+UCI Machine Learning Repository
+http://mlearn.ics.uci.edu/MLRepository.html
+
+UCI Machine Learning Repository: Iris Data Set
+https://archive.ics.uci.edu/ml/datasets/Iris
+
+Artificial Intelligence A Modern Approach (3rd Edition).pdf
+https://www.ics.uci.edu/~rickl/courses/cs-171/aima-resources/Artificial%2520Intelligence%2520A%2520Modern%2520Approach%2520(3rd%2520Edition).pdf
+
+UCI Machine Learning Repository: Parkinsons Data Set
+https://archive.ics.uci.edu/ml/datasets/Parkinsons
+
+security, privacy, and cryptography @ the bren school of information ...
+https://www.ics.uci.edu/faculty/area/area_security.php
+
+Welcome to Sprout
+http://sprout.ics.uci.edu/
+
+A cryptosystem has (at least) five ingredients: Security usually ...
+http://sconce.ics.uci.edu/134-S11/LEC3.pdf
+
+Gene Tsudik's Info Page
+http://www.ics.uci.edu/~gts/
+
+Modular Security: Design and Analysis
+http://www.ics.uci.edu/~jie/candidacy.pdf
+
+Timing is Everything – Embedded Systems Demand - University of ...
+https://www.ics.uci.edu/~givargis/pubs/C38.pdf
+
+Representational State Transfer (REST)
+https://www.ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm
+
+Architectural Styles and the Design of Network-based Software ...
+https://www.ics.uci.edu/~fielding/pubs/dissertation/top.htm
+
+Fielding's dissertation - UCI
+https://www.ics.uci.edu/~fielding/pubs/dissertation/fielding_dissertation.pdf
+
+Fielding Dissertation: Introduction
+https://www.ics.uci.edu/~fielding/pubs/dissertation/introduction.htm
+
+Representational State Transfer: An Architectural Style for ...
+http://www.ics.uci.edu/~fielding/talks/webarch_9805/
+
+Learning Science Through Computer Games and Simulations
+http://www.ics.uci.edu/~wscacchi/GameLab/Recommended%2520Readings/Learning-Science-Games-2011.pdf
+
+In the News @ Donald Bren School of Information and Computer ...
+https://www.ics.uci.edu/community/news/view_news.php%3Fid%3D1127
+
+CS 221 - Information Retrieval - UCI
+http://www.ics.uci.edu/~lopes/teaching/cs221W12/
+
+CS 221 - Information Retrieval
+http://www.ics.uci.edu/~lopes/teaching/cs221W13/
+
+Information Retrieval Assignments
+http://www.ics.uci.edu/~kay/courses/i141/hw/asst5.html
+
+Introduction to Information Retrieval INF 141/ CS 121 Donald J ...
+https://www.ics.uci.edu/~djp3/classes/2014_01_INF141/Lectures/Lecture_18.pdf
+
+Information Retrieval Assignments
+http://www.ics.uci.edu/~kay/courses/i141/hw/asst4.html
+
