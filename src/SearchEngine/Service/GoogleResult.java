@@ -55,9 +55,9 @@ public class GoogleResult {
                 String linkHref = result.attr("href");
                 String linkText = result.text();
                 System.out.println("Text::" + linkText + ", URL:" + linkHref.substring(7, linkHref.indexOf("&")));
-                writer.write(linkText + System.getProperty("line.separator") + linkHref.substring(7, linkHref.indexOf("&")) + System.getProperty("line.separator"));
-                writer.write(System.getProperty("line.separator"));
+                writer.write( linkHref.substring(7, linkHref.indexOf("&")) + System.getProperty("line.separator"));
             }
+            writer.write(System.getProperty("line.separator"));
         }
         writer.close();
 
