@@ -270,6 +270,10 @@ public class PageService {
         for (PageDao pageDao : list) {
             System.out.println(pageDao.getUrl() + "," + pageDao.getTotalScore());
         }
+         NDGC n=new NDGC();
+         n.initial(list,"mondego");
+        double kNDGC= n.getKthNDGC();
+         List<Double> NDGClist=n.getNDGCList();
     }
 
 
