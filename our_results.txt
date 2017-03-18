@@ -1,0 +1,66 @@
+mondego
+mondego.ics.uci.edu
+www.ics.uci.edu/~lopes
+www.ics.uci.edu/~aftabh
+mondego.ics.uci.edu/datasets/wikipedia-events
+mondego.ics.uci.edu/projects/clonedetection/tool/demo?C=S;O=D
+
+machine learning
+archive.ics.uci.edu/ml
+archive.ics.uci.edu/ml/index.html
+archive.ics.uci.edu/ml/contact.html
+mlearn.ics.uci.edu/MLOther.html
+cbcl.ics.uci.edu/doku.php/software/arem?do=login§ok=64291e747c02ff18ebe952722d40a982
+
+information retrieval
+www.ics.uci.edu/~kay/courses/i141/refs.html
+www.ics.uci.edu/~lopes/teaching/cs221W15/index.html
+www.ics.uci.edu/~lopes/teaching/cs221W13/index.html
+mlearn.ics.uci.edu/MLOther.html
+www.ics.uci.edu/~ejw/authoring/orem/namespace/tsld031.htm
+
+software engineering
+www.ics.uci.edu/~ziv/ooad/intro_to_se/sld027.htm
+
+
+security
+www.ics.uci.edu/~irus//css/98/mini-tutorial/sld055.htm
+checkmate.ics.uci.edu
+fano.ics.uci.edu/cites/Location/Sequences-II-Communication-Security-and-Computer-Science.html
+www.ics.uci.edu/~yingtong/research.html
+www.ics.uci.edu/~stasio/fall04/ics268.html
+
+student affairs
+www.ics.uci.edu/ugrad/sao/SAO_Events.php
+www.ics.uci.edu/about/search/search_sao.php
+students.uci.edu
+honors.ics.uci.edu/contact-us
+www.ics.uci.edu/~kay/courses/31/placement.html
+
+graduate courses
+www.ics.uci.edu/~ics184/TA.html
+www.ics.uci.edu/grad/courses/index.php
+www.ics.uci.edu/ugrad/courses/index
+www.ics.uci.edu/grad/policies/GradPolicies_PreviousMSdegree.php
+www.ics.uci.edu/ugrad/sao/index
+
+Crista Lopes
+www.ics.uci.edu/~lopes/patents.html
+www.ics.uci.edu/~lopes
+www.ics.uci.edu/~lopes/aop/aop-pics.html
+vcp.ics.uci.edu/content/10000-gold-20-dollars-exploratory-study-world-warcraft-gold-buyers-0
+sdcl.ics.uci.edu/2014/07/crowd-programming-featured-on-acm-technews
+
+REST
+www.ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm
+www.ics.uci.edu/~fielding/pubs/dissertation/top.htm
+www.ics.uci.edu/~eppstein/pubs/filter.c
+www.ics.uci.edu/~ejw/authoring/sanmateo/fein_slides/sld010.htm
+wics.ics.uci.edu/category/news/info-session?afg12_page_id=2page/2/&afg13_page_id=2&afg34_page_id=4&afg15_page_id=3&afg41_page_id=3&afg43_page_id=3&afg22_page_id=2
+
+computer games
+vcp.ics.uci.edu/content/exploring-potential-computer-games-decentralized-command-and-control
+fano.ics.uci.edu/cites/Organization/Int-Computer-Games-Assoc.html
+www.ics.uci.edu/computing/policy/ethics.php
+www.ics.uci.edu/~nalini/home.html
+evoke.ics.uci.edu?one_page_portfolio=social-capital&replytocom=18180

@@ -38,7 +38,7 @@ public class PageDao {
     }
 
     public double computeTotalScore() {
-        this.totalScore = this.cosineSimilarity + this.pageRank * (this.titleScore + this.urlScore);
+        this.totalScore = this.cosineSimilarity + Math.min(this.pageRank, 1.0) + 2.5 * this.titleScore + this.urlScore;
 
         return this.totalScore;
     }

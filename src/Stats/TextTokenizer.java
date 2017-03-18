@@ -15,7 +15,6 @@ public class TextTokenizer {
     public TextTokenizer() {
 
         stopWords = new HashSet<String>();
-        myStemmer = new Stemmer();
 
         //String filepath = new File("").getAbsolutePath();
         File stopWordListFile = new File(baseFilepath + "/src/longStopWordList.txt");
@@ -37,7 +36,9 @@ public class TextTokenizer {
                 i++;
             }
             if (token.length() > 0 && !stopWords.contains(token)) {
+                myStemmer = new Stemmer();
                 myStemmer.add(token.toString().toCharArray(), token.length());
+                myStemmer.stem();
                 String newToken = myStemmer.toString();
 
                 tokenList.add(newToken);

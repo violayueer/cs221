@@ -3,6 +3,7 @@ package SearchEngine.Service;
 import SearchEngine.Dao.PageDao;
 import Stats.TextTokenizer;
 
+
 import java.io.*;
 import java.util.*;
 
@@ -20,6 +21,8 @@ public class PageService {
     private static String outMapFilePath = baseFilepath + "/outMap.ser";
     private static String termFrequencyMapFilePath = baseFilepath + "/termFrequencyMap.ser";
     private static String urlDocLengthMapFilePath = baseFilepath + "/urlDocLengthMap.ser";
+
+    private static String duplicateUrlsFilePath = baseFilepath + "/duplicateUrls.txt";
 
     // term - termId map
     private static Map<String, Integer> termtoTermIdMap = deserializeMap(termtoTermIdMapFilePath);
@@ -43,6 +46,8 @@ public class PageService {
 
     private static Map<Integer, Integer> termFrequencyMap = deserializeMap(termFrequencyMapFilePath);
     private static Map<Integer, Integer> urlDocLengthMap = deserializeMap(urlDocLengthMapFilePath);
+
+    private static Set<String> duplicateUrls = loadDuplicateUrls(duplicateUrlsFilePath);
 
     private TextTokenizer textTokenizer;
 
@@ -104,13 +109,13 @@ public class PageService {
                     String url = urlIdtoUrlMap.get(urlId);
                     String title = urlTitleMap.get(urlId);
 
-                    computePageUrlScore(page, queryTerms);
-
                     page.setUrlId(urlId);
                     page.setUrl(url);
                     page.setTfidf(tfidf);
                     page.setTitle(title);
                     page.setPageRank(pageRankMap.get(urlId));
+
+                    computePageUrlScore(page, queryTerms);
 
                     pageMap.put(urlId, page);
                 }
@@ -125,6 +130,18 @@ public class PageService {
             int docLength = urlDocLengthMap.get(urlId);
 
             PageDao page = pageMap.get(urlId);
+
+            boolean checkDuplicate = false;
+            for (String duplicateUrl : duplicateUrls) {
+                if (page.getUrl().contains(duplicateUrl)) {
+                    checkDuplicate = true;
+                    break;
+                }
+            }
+            if (checkDuplicate) {
+                continue;
+            }
+
             page.setCosineSimilarity(page.getCosineSimilarity() / (double)docLength);
 
             page.computeTotalScore();
@@ -146,14 +163,16 @@ public class PageService {
     public void computePageUrlScore(PageDao page, List<String> queryTerms) {
         String url = page.getUrl();
         String[] domains = url.split("/");
-
+        int count = 0;
         for (String term : queryTerms) {
             for (String domain : domains) {
                 if (domain.contains(term)) {
-                    page.setUrlScore(page.getUrlScore() + 0.25);
+                    count++;
+                    break;
                 }
             }
         }
+        page.setUrlScore(0.5 * (double)count / (double)domains.length);
     }
 
     public double computeQueryTFIDF(String queryTerm, int df) {
@@ -186,6 +205,22 @@ public class PageService {
             e.printStackTrace();
         }
         return map;
+    }
+
+    private static Set<String> loadDuplicateUrls(String filePath) {
+        Set<String> set = new HashSet<>();
+        try {
+            File duplicateUrlFile = new File(filePath);
+            Scanner sc = new Scanner(duplicateUrlFile);
+
+            while (sc.hasNextLine()) {
+                String line = sc.nextLine();
+                set.add(line);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return set;
     }
 
     public void constructIdMap(Map<Integer, String> targetMap, Map<String, Integer> sourceMap) {

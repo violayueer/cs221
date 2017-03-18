@@ -480,27 +480,36 @@ public class IndexBuilder {
 
     public void computePageRank(int n) {
         //initialize pageRankMap
+        double initialValue = 1.0 / (double)outMap.size();
         for (int urlId : outMap.keySet()) {
-            pageRankMap.put(urlId, 1.0);
+            pageRankMap.put(urlId, initialValue);
         }
 
         for (int i = 0; i < n; i++) {
+            Map<Integer, Double> temp = new HashMap<>();
 
             for (int urlId : pageRankMap.keySet()) {
-                double pageRank = 0;
+                double pageRank = 0.15;
                 Set<Integer> inSet = inMap.get(urlId);
 
                 if (inSet == null || inSet.size() == 0) {
                     continue;
                 }
-
                 for (int inUrlId : inSet) {
-                    pageRank += pageRankMap.get(inUrlId) / (double)outMap.get(inUrlId).size();
-
+                    if (!pageRankMap.containsKey(inUrlId)) {
+                        continue;
+                    }
+                    double inUrlIdPR = pageRankMap.get(inUrlId);
+                    double outCount = (double)outMap.get(inUrlId).size();
+                    pageRank += 0.85 * inUrlIdPR / outCount;
+                    if (pageRank >= 10) {
+                        System.out.println(urlId);
+                    }
                 }
-                pageRank = pageRank * 0.85 + 0.15;
-                pageRankMap.put(urlId, pageRank);
+                //pageRank = pageRank * 0.85 + 0.15;
+                temp.put(urlId, pageRank);
             }
+            pageRankMap.putAll(temp);
         }
     }
 
@@ -552,16 +561,16 @@ public class IndexBuilder {
 
     public static void main(String[] args) {
         IndexBuilder id = new IndexBuilder();
-        id.initialize();
-        id.readData();
-        id.outputResult();
+        //id.initialize();
+        //id.readData();
+        //id.outputResult();
 
-        //String inMapFilePath = "/Users/Yue/IdeaProjects/cs221_new/inMap.ser";
-        //String outMapFilePath = "/Users/Yue/IdeaProjects/cs221_new/outMap.ser";
+        String inMapFilePath = "/Users/Yue/IdeaProjects/cs221_new/inMap.ser";
+        String outMapFilePath = "/Users/Yue/IdeaProjects/cs221_new/outMap.ser";
 
-        //id.inMap = id.deserializeMap(inMapFilePath);
-        //id.outMap = id.deserializeMap(outMapFilePath);
-        id.computePageRank(30);
+        id.inMap = id.deserializeMap(inMapFilePath);
+        id.outMap = id.deserializeMap(outMapFilePath);
+        id.computePageRank(15);
         id.writeMapToDisk("pageRankMap.ser", id.pageRankMap);
     }
 }
