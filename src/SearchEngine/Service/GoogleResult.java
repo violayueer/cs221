@@ -55,7 +55,10 @@ public class GoogleResult {
                 String linkHref = result.attr("href");
                 String linkText = result.text();
                 System.out.println("Text::" + linkText + ", URL:" + linkHref.substring(7, linkHref.indexOf("&")));
-                writer.write( linkHref.substring(7, linkHref.indexOf("&")) + System.getProperty("line.separator"));
+                if(linkHref.charAt(14) == '/')
+                    writer.write( linkHref.substring(15, linkHref.indexOf("&")) + System.getProperty("line.separator"));
+                else
+                    writer.write( linkHref.substring(14, linkHref.indexOf("&")) + System.getProperty("line.separator"));
             }
             writer.write(System.getProperty("line.separator"));
         }
