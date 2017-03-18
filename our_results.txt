@@ -7,10 +7,10 @@ mondego.ics.uci.edu/projects/clonedetection/tool/demo?C=S;O=D
 
 machine learning
 archive.ics.uci.edu/ml
-archive.ics.uci.edu/ml/index.html
 archive.ics.uci.edu/ml/contact.html
-mlearn.ics.uci.edu/MLOther.html
-cbcl.ics.uci.edu/doku.php/software/arem?do=login§ok=64291e747c02ff18ebe952722d40a982
+archive.ics.uci.edu/ml/about.html
+archive.ics.uci.edu/ml/citation_policy.html
+archive.ics.uci.edu/ml/datasets/contact.html
 
 information retrieval
 www.ics.uci.edu/~kay/courses/i141/refs.html
@@ -20,8 +20,11 @@ mlearn.ics.uci.edu/MLOther.html
 www.ics.uci.edu/~ejw/authoring/orem/namespace/tsld031.htm
 
 software engineering
-www.ics.uci.edu/~ziv/ooad/intro_to_se/sld027.htm
-
+www.ics.uci.edu/~irus//bart/flyers/99/presentations/july99-neno/sld025.htm
+www.ics.uci.edu/~ziv/ooad/intro_to_se/tsld008.htm
+computableplant.ics.uci.edu/sw.html
+www.ics.uci.edu/~ziv/diss/intropaper/node2.html
+www.ics.uci.edu/~taylor/ICS223/syllabus.html
 
 security
 www.ics.uci.edu/~irus//css/98/mini-tutorial/sld055.htm
