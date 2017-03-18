@@ -1,160 +1,70 @@
 mondego:
-Mondego Group @ UC Irvine
 http://mondego.ics.uci.edu/
-
-Code Clone Detection
 http://mondego.ics.uci.edu/projects/clonedetection/
-
-SourcererCC
 http://mondego.ics.uci.edu/projects/SourcererCC/
-
-Crista Lopes Home Page at UCI
 http://www.ics.uci.edu/~lopes/
-
-UCI Mondego vLab
 http://nile.ics.uci.edu:9000/
 
 machine+learning:
-UC Irvine Machine Learning Repository - UCI Machine Learning ...
 http://archive.ics.uci.edu/ml/
-
-UCI Machine Learning Repository: Data Sets
 https://archive.ics.uci.edu/ml/datasets.html
-
-Center for Machine Learning and Intelligent Systems | University of ...
 http://cml.ics.uci.edu/
-
-Southern California Machine Learning Symposium | Center for ...
 http://cml.ics.uci.edu/2016/03/southern-california-machine-learning-symposium/
-
-Index of /ml/machine-learning-databases - UCI
 https://archive.ics.uci.edu/ml/machine-learning-databases/
 
 software+engineering:
-Software Engineering (SE) « Degrees « Bren School of Information ...
 http://www.ics.uci.edu/prospective/en/degrees/software-engineering/
-
-undergraduate degree in software engineering @ the bren school of ...
 https://www.ics.uci.edu/ugrad/degrees/degree_se.php
-
-software engineering @ the bren school of information and ...
 https://www.ics.uci.edu/faculty/area/area_software.php
-
-SOFTWARE ENGINEERING @ UCI
 https://www.ics.uci.edu/prospective/pdf/se.pdf
-
-Software Engineering Vs. Programming
 https://www.ics.uci.edu/~ziv/ooad/intro_to_se/tsld008.htm
 
 security:
-security, privacy, and cryptography @ the bren school of information ...
 https://www.ics.uci.edu/faculty/area/area_security.php
-
-A cryptosystem has (at least) five ingredients: Security usually ...
 http://sconce.ics.uci.edu/134-S11/LEC3.pdf
-
-Delay and Disruption Tolerant Network (DTN) Security - Sprout
 http://sprout.ics.uci.edu/projects/dtn/
-
-linux security @ the bren school of information and computer sciences
 https://www.ics.uci.edu/computing/linux/security.php
-
-Modular Security: Design and Analysis
 http://www.ics.uci.edu/~jie/candidacy.pdf
 
 student+affairs:
-Student Affairs « Contact « Bren School of Information and ...
 http://www.ics.uci.edu/prospective/en/contact/student-affairs/
-
-student affairs office @ the bren school of information and computer ...
 https://www.ics.uci.edu/about/search/search_sao.php
-
-undergraduate education @ the bren school of information and ...
 https://www.ics.uci.edu/ugrad/
-
-contact a counselor @ the bren school of information and computer ...
 http://www.ics.uci.edu/grad/sao/
-
-Donald Bren School of Information and Computer Sciences - Office ...
 https://www.ics.uci.edu/grad/
 
 graduate+courses:
-graduate course listing @ the bren school of information and ...
 http://www.ics.uci.edu/grad/courses/
-
-This site will look much better in a browser that supports web ...
 https://www.ics.uci.edu/grad/courses/listing.php%3Fyear%3D2016%26level%3DALL%26department%3DECE%26program%3DALL
-
-graduate course listing @ the bren school of information and ...
 https://www.ics.uci.edu/grad/courses/details.php%3Fid%3D88
-
-graduate course listing @ the bren school of information and ...
 https://www.ics.uci.edu/grad/courses/details.php%3Fid%3D521
-
-graduate course listing @ the bren school of information and ...
 https://www.ics.uci.edu/grad/courses/details.php%3Fid%3D368
 
 Crista+Lopes:
-Crista Lopes Home Page at UCI
 http://www.ics.uci.edu/~lopes/
-
-Cristina V. Lopes - Donald Bren School of Information and Computer ...
 https://www.ics.uci.edu/faculty/profiles/view_faculty.php%3Fucinetid%3Dlopes
-
-Crista Lopes' patents
 https://www.ics.uci.edu/~lopes/patents.html
-
-Crista Lopes' publications
 http://www.ics.uci.edu/~lopes/publications.html
-
-CS 221 - Information Retrieval - UCI
 http://www.ics.uci.edu/~lopes/teaching/cs221W12/
 
 REST:
-Representational State Transfer (REST)
 https://www.ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm
-
-Architectural Styles and the Design of Network-based Software ...
 https://www.ics.uci.edu/~fielding/pubs/dissertation/top.htm
-
-Architectural Styles: Design of Network-Based Software ... - UCI
 https://www.ics.uci.edu/~fielding/pubs/dissertation/fielding_dissertation.pdf
-
-Fielding Dissertation: Introduction
 https://www.ics.uci.edu/~fielding/pubs/dissertation/introduction.htm
-
-Representational State Transfer: An Architectural Style for ...
 http://www.ics.uci.edu/~fielding/talks/webarch_9805/
 
 computer+games:
-Computer Game Science « Degrees « Bren School of Information ...
 http://www.ics.uci.edu/prospective/en/degrees/computer-game-science/
-
-undergraduate degree in computer game science @ the bren school ...
 https://www.ics.uci.edu/ugrad/degrees/degree_cgs.php
-
-Center for Computer Games & Virtual Worlds – Bren School of ICS ...
 http://cgvw.ics.uci.edu/
-
-Center for Computer Games and Virtual Worlds - Donald Bren ...
 http://www.ics.uci.edu/~wscacchi/GameLab/CGVW-Dec2012.pdf
-
-computer game science @ uci - Donald Bren School of Information ...
 https://www.ics.uci.edu/ugrad/cgs.pdf
 
 information+retrieval:
-CS 221 - Information Retrieval
 http://www.ics.uci.edu/~lopes/teaching/cs221W15/
-
-CS 221 - Information Retrieval
+http://www.ics.uci.edu/~djp3/classes/2009_01_02_INF141/calendar.html
 http://www.ics.uci.edu/~lopes/teaching/cs221W13/
-
-Exponential Family Harmoniums with an Application to Information ...
 https://www.ics.uci.edu/~welling/publications/papers/GenHarm3.pdf
-
-Informatics 141: Computer Science 121: Information Retrieval
-http://www.ics.uci.edu/~djp3/classes/2014_01_INF141/calendar.html
-
-Automatic ranking of information retrieval systems using data fusion
 http://www.ics.uci.edu/~rnuray/pubs/ipm2006.pdf
 
