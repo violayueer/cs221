@@ -19,15 +19,15 @@ public class GoogleResult {
         List<String>  queries =new ArrayList<>();
 
         String key0="mondego";
-        String key1="machine%20learning";
-        String key2="software%20engineering";
+        String key1="machine+learning";
+        String key2="software+engineering";
         String key3="security";
-        String key4="student%20affairs";
-        String key5="graduate%20courses";
-        String key6="Crista%20Lopes";
+        String key4="student+affairs";
+        String key5="graduate+courses";
+        String key6="Crista+Lopes";
         String key7="REST";
-        String key8="computer%20games";
-        String key9="information%20retrieval";
+        String key8="computer+games";
+        String key9="information+retrieval";
 
         queries.add(key0);
         queries.add(key1);
@@ -50,6 +50,7 @@ public class GoogleResult {
 
             Document doc = Jsoup.connect(request).userAgent("Mozilla/5.0").get();
             Elements results = doc.select("h3.r > a");
+            writer.write(query + ":" + System.getProperty("line.separator"));
             for (Element result : results) {
                 String linkHref = result.attr("href");
                 String linkText = result.text();
