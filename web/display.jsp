@@ -23,9 +23,10 @@
 
 <body>
 <div id="header">
-    <img id="logo" src="../CSS/logo.png" />
-    <form action="${pageContext.request.contextPath}/servlet" method="GET">
-        <input type = "text" name = "query">
+	<img id="logo" src="logo.png" />
+	<form action="${pageContext.request.contextPath}/servlet" method="GET">
+        <input id = "inputText" type = "text" name = "query">
+		<input id = "inputBtn" type = "submit" value="Go!">
     </form>
 </div>
 
