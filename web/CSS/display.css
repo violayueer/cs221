@@ -37,7 +37,7 @@ div#header{
 form{
 	margin:20 0 20 0px;
 }
-input{
+input#inputText{
 	display:inline;
 	float:left;
     width:640px;
@@ -45,6 +45,15 @@ input{
     padding-left: 8px;
     padding-right: 8px;
     font-size: 18px;
+}
+input#inputBtn{
+	display:inline;
+	float:left;
+    width:70px;
+    height:30px;
+	margin-top:5px;
+	margin-left: 20px;
+	font-size: 18px;
 }
 img#logo{
 	display:inline;
